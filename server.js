@@ -347,5 +347,7 @@ app.get('/', (req, res) => {
   res.redirect('/login.html'); // or '/index.html' if you prefer
 });
 
-  app.listen(PORT, () => console.log(`Server running on port http://localhost:${PORT}`));
+//   app.listen(PORT, () => console.log(`Server running on port http://localhost:${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port http://0.0.0.0:${PORT}`));
+
 }
