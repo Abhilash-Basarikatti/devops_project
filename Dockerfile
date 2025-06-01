@@ -4,9 +4,11 @@ FROM node:18
 # Create app directory
 WORKDIR /usr/src/app
 
-# Install dependencies
-COPY package*.json ./
-RUN npm install
+# Copy only package.json and yarn.lock first for better caching
+COPY package.json yarn.lock ./
+
+# Install dependencies using yarn
+RUN yarn install --frozen-lockfile
 
 # Copy app source code
 COPY . .
