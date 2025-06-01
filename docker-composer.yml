@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: fooddb
+      MYSQL_USER: fooduser
+      MYSQL_PASSWORD: foodpass
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  web:
+    build: .
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_USER: fooduser
+      DB_PASSWORD: foodpass
+      DB_NAME: fooddb
+    ports:
+      - "3000:3000"
+    restart: always
+
+volumes:
+  mysql-data:
