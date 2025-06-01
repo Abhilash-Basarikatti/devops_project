@@ -145,16 +145,28 @@ connection.connect(err => {
     if (err) throw err;
     console.log('Database checked/created');
 
-    const db = mysql.createConnection({
-      host: 'localhost',
-      user: 'root',
-      password: '',
-      database: 'foodapp'
-    });
+    // const db = mysql.createConnection({
+    //   host: 'localhost',
+    //   user: 'root',
+    //   password: '',
+    //   database: 'foodapp'
+    // });
 
-    db.connect(err => {
-      if (err) throw err;
-      console.log('Connected to foodapp database');
+    // db.connect(err => {
+    //   if (err) throw err;
+    //   console.log('Connected to foodapp database');
+
+
+    const connection = mysql.createConnection({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'fooduser',
+  password: process.env.DB_PASSWORD || 'foodpass',
+  database: process.env.DB_NAME || 'fooddb',
+});
+
+connection.connect(err => {
+  if (err) throw err;
+  console.log('Connected to MySQL!');
 
       const createUsers = `
         CREATE TABLE IF NOT EXISTS users (
