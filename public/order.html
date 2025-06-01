@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FoodieExpress - Place Order</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .order-form-container {
+      max-width: 480px;
+      margin: 40px auto 80px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgb(0 0 0 / 0.1);
+      padding: 30px 32px;
+    }
+    h2 {
+      margin-bottom: 24px;
+      color: #2c3e50;
+      text-align: center;
+      font-weight: 700;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #34495e;
+    }
+    input[type="text"], input[type="tel"], textarea {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 18px;
+      border: 1.8px solid #bdc3c7;
+      border-radius: 6px;
+      font-size: 15px;
+      font-family: inherit;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus, input[type="tel"]:focus, textarea:focus {
+      border-color: #4a90e2;
+      outline: none;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 14px 0;
+      background: #4a90e2;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .btn-submit:hover {
+      background: #357abd;
+    }
+    .message {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: 600;
+    }
+    header, footer {
+      font-weight: 700;
+      font-size: 28px;
+      text-align: center;
+      padding: 16px 0;
+      background-color: #4a90e2;
+      color: white;
+      user-select: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    footer {
+      font-size: 14px;
+      margin-top: 80px;
+    }
+  </style>
+</head>
+<body>
+
+<header>FoodieExpress</header>
+
+<div class="order-form-container">
+  <h2>Place Your Order</h2>
+  <form id="orderForm">
+    <label for="name">Full Name *</label>
+    <input type="text" id="name" name="name" required placeholder="Your full name" />
+
+    <label for="phone">Phone Number *</label>
+    <input type="tel" id="phone" name="phone" required placeholder="10-digit mobile number" pattern="[0-9]{10}" />
+
+    <label for="address">Delivery Address *</label>
+    <textarea id="address" name="address" required placeholder="Full delivery address"></textarea>
+
+    <button type="submit" class="btn-submit">Submit Order</button>
+  </form>
+  <div class="message" id="message"></div>
+</div>
+
+<footer>
+  &copy; 2025 FoodieExpress. All rights reserved.
+</footer>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const foodId = params.get('foodId');
+  const messageEl = document.getElementById('message');
+  const orderForm = document.getElementById('orderForm');
+
+  if (!foodId) {
+    messageEl.style.color = 'red';
+    messageEl.textContent = 'No food selected for order. Please go back and select a food.';
+    orderForm.style.display = 'none';
+  }
+
+  orderForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const name = orderForm.name.value.trim();
+    const phone = orderForm.phone.value.trim();
+    const address = orderForm.address.value.trim();
+
+    if (!name || !phone || !address) {
+      messageEl.style.color = 'red';
+      messageEl.textContent = 'Please fill in all fields.';
+      return;
+    }
+
+    // Post order data to server
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ foodId, name, phone, address }),
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to place order');
+      return res.json();
+    })
+    .then(data => {
+      messageEl.style.color = 'green';
+      messageEl.textContent = 'Order placed successfully! Thank you.';
+      orderForm.reset();
+    })
+    .catch(err => {
+      messageEl.style.color = 'red';
+      messageEl.textContent = err.message;
+    });
+  });
+</script>
+
+</body>
+</html>

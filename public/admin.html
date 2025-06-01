@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FoodieExpress - Admin Orders</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: #f5f7fa;
+    }
+    header, footer {
+      font-weight: 700;
+      font-size: 28px;
+      text-align: center;
+      padding: 16px 0;
+      background-color: #4a90e2;
+      color: white;
+      user-select: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      margin-bottom: 20px;
+    }
+    .orders-table {
+      width: 90%;
+      max-width: 1000px;
+      margin: auto;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 6px 15px rgb(0 0 0 / 0.1);
+      overflow: hidden;
+    }
+    .orders-table th, .orders-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    .orders-table th {
+      background-color: #4a90e2;
+      color: white;
+      user-select: none;
+    }
+    .orders-table tr:hover {
+      background-color: #f0f8ff;
+    }
+    caption {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+
+<header>FoodieExpress - Admin Orders</header>
+<div style="text-align:right; max-width: 1000px; margin:auto; padding: 10px;">
+  <a href="/admin/logout" style="color:#4a90e2; font-weight:600;">Logout</a>
+</div>
+
+<table class="orders-table" id="ordersTable">
+  <caption>All Customer Orders</caption>
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Food Name</th>
+      <th>Customer Name</th>
+      <th>Phone</th>
+      <th>Address</th>
+      <th>Order Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td colspan="6" style="text-align:center; padding: 30px;">Loading orders...</td></tr>
+  </tbody>
+</table>
+
+<footer>
+  &copy; 2025 FoodieExpress. All rights reserved.
+</footer>
+
+<script>
+  fetch('/api/admin/orders')
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to fetch orders');
+      return res.json();
+    })
+    .then(data => {
+      const tbody = document.querySelector('#ordersTable tbody');
+      tbody.innerHTML = '';
+      if(data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 30px;">No orders found.</td></tr>';
+        return;
+      }
+      data.forEach(order => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${order.id}</td>
+          <td>${order.food_name}</td>
+          <td>${order.customer_name}</td>
+          <td>${order.phone}</td>
+          <td>${order.address}</td>
+          <td>${new Date(order.created_at).toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(err => {
+      const tbody = document.querySelector('#ordersTable tbody');
+      tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center; padding: 30px;">${err.message}</td></tr>`;
+    });
+</script>
+
+</body>
+</html>

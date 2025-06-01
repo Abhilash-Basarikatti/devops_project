@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FoodieExpress - Home</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Extra styles specific to home page */
+    .search-bar {
+      max-width: 480px;
+      margin: 20px auto 30px;
+      display: flex;
+    }
+
+    .search-bar input[type="text"] {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 16px;
+      border: 1.8px solid #ddd;
+      border-radius: 6px 0 0 6px;
+      transition: border-color 0.3s;
+    }
+
+    .search-bar input[type="text"]:focus {
+      outline: none;
+      border-color: #4a90e2;
+      box-shadow: 0 0 8px #4a90e2aa;
+    }
+
+    .search-bar button {
+      background: #4a90e2;
+      border: none;
+      color: white;
+      padding: 11px 20px;
+      font-size: 16px;
+      border-radius: 0 6px 6px 0;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background-color 0.3s ease;
+    }
+
+    .search-bar button:hover {
+      background: #357abd;
+    }
+
+    .food-list {
+      max-width: 960px;
+      margin: 0 auto 60px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      padding: 0 20px;
+    }
+
+    .food-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .food-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 20px rgb(0 0 0 / 0.15);
+    }
+
+    .food-card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+    }
+
+    .food-info {
+      padding: 15px 18px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .food-name {
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: #2c3e50;
+    }
+
+    .food-price {
+      font-weight: 600;
+      color: #4a90e2;
+      font-size: 16px;
+    }
+
+  </style>
+</head>
+<body>
+
+<header>FoodieExpress</header>
+
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="Search foods..." />
+  <button id="searchBtn">Search</button>
+</div>
+
+<div class="food-list" id="foodList">
+  <!-- Food cards will be loaded here dynamically -->
+</div>
+
+<footer>
+  &copy; 2025 FoodieExpress. All rights reserved.
+</footer>
+
+<script>
+  const foodListEl = document.getElementById('foodList');
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+
+  // Fetch all foods from backend and render
+  async function fetchFoods(query = '') {
+    try {
+      let url = '/api/foods';
+      if (query) {
+        url += '?search=' + encodeURIComponent(query);
+      }
+      const res = await fetch(url);
+      const foods = await res.json();
+
+      foodListEl.innerHTML = '';
+
+      if (foods.length === 0) {
+        foodListEl.innerHTML = '<p style="text-align:center; color:#666;">No foods found.</p>';
+        return;
+      }
+
+      foods.forEach(food => {
+        const card = document.createElement('div');
+        card.className = 'food-card';
+        card.innerHTML = `
+          <img src="${food.image_url}" alt="${food.name}" />
+
+          <div class="food-info">
+            <div class="food-name">${food.name}</div>
+           <div class="food-price">₹${Number(food.price).toFixed(2)}</div>
+
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          window.location.href = `/food.html?id=${food.id}`;
+        });
+
+        foodListEl.appendChild(card);
+      });
+    } catch (err) {
+      console.error('Failed to fetch foods:', err);
+      foodListEl.innerHTML = '<p style="text-align:center; color:red;">Failed to load foods.</p>';
+    }
+  }
+
+  searchBtn.addEventListener('click', () => {
+    const query = searchInput.value.trim();
+    fetchFoods(query);
+  });
+
+  searchInput.addEventListener('keypress', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      searchBtn.click();
+    }
+  });
+
+  // Initial load
+  fetchFoods();
+</script>
+
+</body>
+</html>

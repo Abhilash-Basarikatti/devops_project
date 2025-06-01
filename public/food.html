@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FoodieExpress - Food Details</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .food-details {
+      max-width: 600px;
+      margin: 40px auto 80px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgb(0 0 0 / 0.1);
+      overflow: hidden;
+      padding-bottom: 24px;
+    }
+    .food-img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      display: block;
+      border-radius: 12px 12px 0 0;
+    }
+    .food-info {
+      padding: 20px 24px;
+      color: #2c3e50;
+    }
+    .food-name {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .food-price {
+      font-size: 20px;
+      font-weight: 600;
+      color: #4a90e2;
+      margin-bottom: 20px;
+    }
+    .food-desc {
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 30px;
+      color: #555;
+    }
+    .btn-order {
+      display: inline-block;
+      background: #4a90e2;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 14px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+    .btn-order:hover {
+      background: #357abd;
+    }
+  </style>
+</head>
+<body>
+
+<header>FoodieExpress</header>
+
+<div class="food-details" id="foodDetails">
+  <!-- Food details will load here dynamically -->
+  <p style="text-align:center; padding: 40px;">Loading...</p>
+</div>
+
+<footer>
+  &copy; 2025 FoodieExpress. All rights reserved.
+</footer>
+
+<script>
+  // Get food id from URL query param
+  const params = new URLSearchParams(window.location.search);
+  const foodId = params.get('id');
+
+  const foodDetailsEl = document.getElementById('foodDetails');
+
+  if (!foodId) {
+    foodDetailsEl.innerHTML = '<p style="text-align:center; color:red; padding:40px;">No food selected.</p>';
+  } else {
+    fetch(`/api/food/${foodId}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Food not found');
+        return res.json();
+      })
+      .then(food => {
+        foodDetailsEl.innerHTML = `
+        <img src="${food.image_url}" alt="${food.name}" class="food-img" />
+
+          <div class="food-info">
+            <h1 class="food-name">${food.name}</h1>
+           <div class="food-price">₹${Number(food.price).toFixed(2)}</div>
+
+            <p class="food-desc">${food.description || 'Delicious food to satisfy your cravings.'}</p>
+            <a href="order.html?foodId=${food.id}" class="btn-order">Place Order</a>
+          </div>
+        `;
+      })
+      .catch(err => {
+        foodDetailsEl.innerHTML = `<p style="text-align:center; color:red; padding:40px;">${err.message}</p>`;
+      });
+  }
+</script>
+
+</body>
+</html>
